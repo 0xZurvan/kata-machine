@@ -3,14 +3,14 @@ export default function bs_list(haystack: number[], needle: number): boolean {
   let high = haystack.length - 1
 
   for (let i = 0; i < haystack.length; ++i) {
-    const mid = Math.floor((high + low) / 2)
-    
-    if (haystack[mid] === needle)
+    const mid = Math.floor((low + high) / 2)
+
+    if (needle === haystack[mid])
       return true
-    else if (haystack[mid] < needle)
+    else if (needle > haystack[mid])
       low = mid + 1
     else
-      high = mid - 1
+      high = mid
   }
 
   return false
