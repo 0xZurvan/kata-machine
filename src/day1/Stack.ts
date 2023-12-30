@@ -1,6 +1,6 @@
 interface Node<T> {
   value: T
-  prev?: Node<T>
+  next?: Node<T>
 }
 export default class Stack<T> {
   public length: number
@@ -13,13 +13,12 @@ export default class Stack<T> {
 
   push(item: T): void {
     ++this.length
-    const node = { value: item } as Node<T>
-    if (!this.head) {
-      this.head = node
-      return
-    }
+    const node: Node<T> = { value: item }
 
-    node.prev = this.head
+    if (!this.head)
+      this.head = node
+
+    node.next = this.head
     this.head = node
   }
 
@@ -28,13 +27,13 @@ export default class Stack<T> {
       return undefined
 
     --this.length
-    const head = this.head
-    this.head = this.head.prev
-    head.prev = undefined
+    const head = this.head as Node<T>
+    this.head = head.next
 
     if (this.length === 0)
       this.head = undefined
 
+    head.next = undefined
     return head.value
   }
 

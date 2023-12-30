@@ -15,7 +15,7 @@ export default class Queue<T> {
 
   enqueue(item: T): void {
     ++this.length
-    const node = {value: item} as Node<T>
+    const node: Node<T> = { value: item }
 
     if (!this.tail) {
       this.tail = this.head = node
@@ -31,13 +31,12 @@ export default class Queue<T> {
       return undefined
 
     --this.length
-
     const head = this.head
-    this.head = this.head.next
+    this.head = head.next
     head.next = undefined
 
-    if(this.length === 0)
-      this.tail = undefined
+    if (this.length === 0)
+      this.head = this.tail = undefined
 
     return head.value
   }

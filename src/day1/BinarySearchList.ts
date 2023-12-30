@@ -5,9 +5,9 @@ export default function bs_list(haystack: number[], needle: number): boolean {
   for (let i = 0; i < haystack.length; ++i) {
     const mid = Math.floor((low + high) / 2)
 
-    if (needle === haystack[mid])
+    if (haystack[mid] === needle)
       return true
-    else if (needle > haystack[mid])
+    else if (haystack[mid] < needle)
       low = mid + 1
     else
       high = mid
