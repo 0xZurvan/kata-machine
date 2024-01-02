@@ -15,8 +15,8 @@ export default class DoublyLinkedList<T> {
   }
 
   prepend(item: T): void {
-    ++this.length
-    const node: Node<T> = { value: item }
+    this.length += 1
+    const node = { value: item } as Node<T>
 
     if (!this.head) {
       this.head = this.tail = node
@@ -29,10 +29,10 @@ export default class DoublyLinkedList<T> {
   }
 
   insertAt(item: T, idx: number): void {
-    if (idx > this.length || idx < 0) {
-      throw new Error('Index out of bounds')
-    }
-    else if (idx === this.length) {
+    if (idx > this.length)
+      throw new Error('Oh no')
+
+    if (idx === this.length) {
       this.append(item)
       return
     }
@@ -41,102 +41,92 @@ export default class DoublyLinkedList<T> {
       return
     }
 
-    ++this.length
-    const node: Node<T> = { value: item }
+    this.length += 1
+    const curr = this.getAt(idx) as Node<T>
+    const node = { value: item } as Node<T>
 
-    if (!this.head) {
+    node.next = curr
+    node.prev = curr.prev
+    curr.prev = node
+
+    if (node.prev)
+      node.prev.next = curr
+  }
+
+  append(item: T): void {
+    this.length += 1
+    const node = { value: item } as Node<T>
+
+    if (!this.tail) {
       this.head = this.tail = node
       return
     }
 
-    let curr = this.head
-    for (let i = 0; i < idx && curr && curr.next; ++i)
-      curr = curr.next
+    node.prev = this.tail
+    this.tail.next = node
 
-    node.next = curr
-    node.prev = curr.prev
-
-    const prev = curr.prev
-    if (prev) {
-      prev.next = node
-      curr.prev = node
-    }
-  }
-
-  append(item: T): void {
-    ++this.length
-    const node: Node<T> = { value: item }
-
-    if (!this.tail) {
-      this.tail = this.head = node
-      return
-    }
-
-    node.next = this.tail
-    this.tail.prev = node
     this.tail = node
   }
 
   remove(item: T): T | undefined {
-    if (!this.head)
-      return undefined
-
-    let curr: Node<T> = this.head
-    for (let i = 0; i < this.length && curr && curr.next; ++i) {
-      if (curr.value === item)
+    let node = this.head
+    for (let i = 0; node && node.next && i < this.length; ++i) {
+      if (node.value === item)
         break
-      curr = curr.next
+      node = node.next
     }
 
-    if (!curr)
+    if (node === undefined)
       return undefined
 
-    --this.length
-    const prev = curr.prev
-    if (prev && curr.next) {
-      prev.next = curr.next
-      curr.next.prev = prev
-      curr.next = undefined
-      curr.prev = undefined
-    }
-
-    if(this.length === 0)
-      this.head = this.tail = undefined
-
-    return curr.value
+    return this.removeNode(node)
   }
 
   get(idx: number): T | undefined {
-    let curr = this.head
-    for (let i = 0; i < idx && curr; ++i)
-      curr = curr.next
-
-    return curr?.value
+    return this.getAt(idx)?.value
   }
 
   removeAt(idx: number): T | undefined {
-    if (idx > this.length || idx < 0)
-      throw new Error('Index out of bounds')
+    const node = this.getAt(idx)
 
-    let curr = this.head
-    for (let i = 0; i < idx && curr; ++i)
-      curr = curr.next
-
-    if (!curr)
+    if (!node)
       return undefined
 
-    --this.length
-    const prev = curr.prev
-    if (prev && curr.next) {
-      prev.next = curr.next
-      curr.next.prev = prev
-      curr.next = undefined
-      curr.prev = undefined
+    return this.removeNode(node)
+  }
+
+  private removeNode(node: Node<T>): T | undefined {
+    this.length -= 1
+    if (this.length === 0) {
+      const out = this.head?.value
+      this.head = this.tail = undefined
+      return out
     }
 
-    if(this.length === 0)
-      this.head = this.tail = undefined
+    if (node.prev)
+      node.prev.next = node.next
 
-    return curr.value
+    if (node.next)
+      node.next.prev = node.prev
+
+    if (node === this.head)
+      this.head = node.next
+
+    if (node === this.tail)
+      this.tail = node.prev
+
+    node.prev = node.next = undefined
+    return node?.value
+  }
+
+  private getAt(idx: number): Node<T> | undefined {
+    if (!this.head)
+      return undefined
+
+    let curr = this.head
+    for (let i = 0; curr && curr.next && i < idx; ++i)
+      curr = curr.next
+
+    return curr
   }
 }
